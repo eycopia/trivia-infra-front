@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilo global oscuro para ahorrar batería y verse pro */
+body { background-color: #0f172a; color: white; font-family: sans-serif; }
+.btn-push { transition: transform 0.1s; }
+.btn-push:active { transform: scale(0.95); }
