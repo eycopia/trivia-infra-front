@@ -55,7 +55,7 @@ import { environment } from '../environments/environment';
         <div class="h-full flex flex-col pt-20 pb-8 px-8">
           <div class="w-full h-6 bg-gray-800 rounded-full mb-8 overflow-hidden border border-gray-600">
             <div class="h-full bg-yellow-400 transition-all duration-1000 ease-linear"
-                 [style.width.%]="(timeLeft / 20) * 100"></div>
+                 [style.width.%]="(timeLeft / 10) * 100"></div>
           </div>
 
           <h2 class="text-5xl font-bold text-center mb-12">{{ currentQuestion.t }}</h2>
@@ -118,7 +118,7 @@ export class HostScreenComponent implements OnInit {
   gameState: 'WAITING' | 'QUESTION' | 'RESULT' = 'WAITING';
 
   // Datos para mostrar
-  timeLeft = 20; // Segundos
+  timeLeft = 10; // Segundos
   timerInterval: any;
 
   roundWinners: any[] = [];
@@ -184,7 +184,6 @@ export class HostScreenComponent implements OnInit {
 
   startNextQuestion() {
     if (this.currentQIndex >= this.questionsList.length) return;
-    console.log("aaaaaaaaaaaaaa", this.currentQIndex, this.questionsList.length)
 
     const token = localStorage.getItem('admin_token');
     this.socketService.emit('ADMIN_START_QUESTION', {
@@ -215,7 +214,7 @@ export class HostScreenComponent implements OnInit {
 
   // --- UTILIDADES ---
   startTimer() {
-    this.timeLeft = 20;
+    this.timeLeft = 10;
     if (this.timerInterval) clearInterval(this.timerInterval);
 
     this.timerInterval = setInterval(() => {
