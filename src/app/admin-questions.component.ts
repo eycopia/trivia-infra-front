@@ -25,7 +25,7 @@ import { environment } from '../environments/environment';
             <input [(ngModel)]="newQuestion.text" type="text" class="w-full bg-slate-700 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none">
           </div>
 
-          <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="grid grid-cols-1 gap-4 mb-4">
             @for (opt of newQuestion.options; track $index) {
                 <div>
                     <label class="block text-gray-300 text-xs font-bold mb-1">Opción {{ $index + 1 }}</label>
@@ -52,13 +52,20 @@ import { environment } from '../environments/environment';
         <div>
             <h2 class="text-xl font-bold mb-4">Preguntas Actuales ({{ questions.length }})</h2>
             @for (q of questions; track q.id) {
-                <div class="bg-slate-800 p-4 rounded-lg mb-2">
-                    <p class="font-bold text-lg">{{ q.text }}</p>
-                    <ul class="mt-2 list-disc list-inside text-gray-300">
-                        @for (opt of q.options; track opt; let i = $index) {
-                            <li [class.text-green-400]="i === q.answer_idx">{{ opt }}</li>
-                        }
-                    </ul>
+                <div class="bg-slate-800 p-4 rounded-lg mb-2 flex justify-between items-start">
+                    <div class="flex-1">
+                        <p class="font-bold text-lg">{{ q.text }}</p>
+                        <ul class="mt-2 list-disc list-inside text-gray-300">
+                            @for (opt of q.options; track opt; let i = $index) {
+                                <li [class.text-green-400]="i === q.answer_idx">{{ opt }}</li>
+                            }
+                        </ul>
+                    </div>
+                    <button (click)="deleteQuestion(q.id)" 
+                            class="ml-4 text-red-400 hover:text-red-300 transition p-2"
+                            title="Eliminar pregunta">
+                        🗑️
+                    </button>
                 </div>
             }
         </div>
@@ -113,6 +120,20 @@ export class AdminQuestionsComponent implements OnInit {
                 this.loadQuestions();
             },
             error: (err) => alert('Error: ' + err.message)
+        });
+    }
+
+    deleteQuestion(questionId: number) {
+        if (!confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) return;
+
+        const token = localStorage.getItem('admin_token');
+        const headers = new HttpHeaders().set('Authorization', token || '');
+
+        this.http.delete(`${environment.apiUrl}/api/questions/${questionId}`, { headers }).subscribe({
+            next: () => {
+                this.loadQuestions();
+            },
+            error: (err) => alert('Error al eliminar: ' + err.message)
         });
     }
 
