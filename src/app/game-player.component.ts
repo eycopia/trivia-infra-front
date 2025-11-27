@@ -122,7 +122,11 @@ export class GamePlayerComponent implements OnInit {
       this.status = 'RESULT';
 
       const myId = this.socketService.socketId;
-      const amIWinner = res.roundWinners.some((w: any) => w.id === myId || w.playerId === myId);
+      const myPlayerId = localStorage.getItem('player_id');
+
+      const amIWinner = res.roundWinners.some((w: any) =>
+        w.id === myId || (myPlayerId && w.playerId === myPlayerId)
+      );
 
       if (amIWinner) {
         this.resultMessage = "¡GANASTE! VE POR TU PREMIO 🎁";

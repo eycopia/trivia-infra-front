@@ -36,11 +36,17 @@ import { environment } from '../environments/environment';
               }
           </div>
 
-          <button (click)="startNextQuestion()" 
-                  [disabled]="currentQIndex >= questionsList.length"
-                  class="px-12 py-4 bg-white text-black text-2xl font-bold rounded-full hover:scale-105 transition disabled:opacity-50">
-            {{ currentQIndex >= questionsList.length ? 'FIN DEL JUEGO' : 'INICIAR PREGUNTA' }}
-          </button>
+          <div class="flex flex-col gap-4">
+            <button (click)="startNextQuestion()" 
+                    [disabled]="currentQIndex >= questionsList.length"
+                    class="px-12 py-4 bg-white text-black text-2xl font-bold rounded-full hover:scale-105 transition disabled:opacity-50">
+              {{ currentQIndex >= questionsList.length ? 'FIN DEL JUEGO' : 'INICIAR PREGUNTA' }}
+            </button>
+            
+            <button (click)="exitGame()" class="text-gray-500 hover:text-white underline">
+                Salir al Panel
+            </button>
+          </div>
         </div>
       }
 
@@ -146,7 +152,12 @@ export class HostScreenComponent implements OnInit {
       }
 
       if (this.gameState === 'QUESTION') {
-        this.startTimer(); // Reiniciar timer visualmente (idealmente sincronizar tiempo exacto)
+        this.startTimer();
+      }
+
+      if (this.gameState === 'RESULT' && state.lastRoundResult) {
+        this.correctAnswerIdx = state.lastRoundResult.correctIdx;
+        this.roundWinners = state.lastRoundResult.roundWinners;
       }
     });
 
@@ -196,6 +207,10 @@ export class HostScreenComponent implements OnInit {
     this.currentQIndex++;
     this.gameState = 'WAITING';
     this.currentQuestion = null;
+  }
+
+  exitGame() {
+    this.router.navigate(['/admin/create-game']);
   }
 
   // --- UTILIDADES ---

@@ -13,7 +13,10 @@ import { environment } from '../environments/environment';
     <div class="min-h-screen bg-slate-900 p-6 font-sans text-white">
       <div class="max-w-2xl mx-auto">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Crear Nuevo Juego</h1>
+            <div class="flex items-center gap-4">
+                <button (click)="goHome()" class="text-gray-400 hover:text-white text-2xl">←</button>
+                <h1 class="text-3xl font-bold">Crear Nuevo Juego</h1>
+            </div>
             <button (click)="goToWinners()" class="text-indigo-400 hover:text-indigo-300">Ver Ganadores</button>
         </div>
         
@@ -105,5 +108,9 @@ export class AdminCreateGameComponent {
 
     goToWinners() {
         this.router.navigate(['/admin/winners']);
+    }
+
+    goHome() {
+        this.router.navigate(['/']);
     }
 }
