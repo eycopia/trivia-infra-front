@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 @Component({
     selector: 'app-admin-questions',
@@ -87,7 +88,7 @@ export class AdminQuestionsComponent implements OnInit {
     }
 
     loadQuestions() {
-        this.http.get<any[]>(`http://localhost:3000/api/games/${this.gameId}/questions`).subscribe(data => {
+        this.http.get<any[]>(`${environment.apiUrl}/api/games/${this.gameId}/questions`).subscribe(data => {
             this.questions = data;
         });
     }
@@ -102,7 +103,7 @@ export class AdminQuestionsComponent implements OnInit {
         const token = localStorage.getItem('admin_token');
         const headers = new HttpHeaders().set('Authorization', token || '');
 
-        this.http.post(`http://localhost:3000/api/games/${this.gameId}/questions`, {
+        this.http.post(`${environment.apiUrl}/api/games/${this.gameId}/questions`, {
             text: this.newQuestion.text,
             options: this.newQuestion.options,
             answer_idx: this.newQuestion.answer_idx

@@ -115,7 +115,16 @@ export class GamePlayerComponent implements OnInit {
     // 3. Resultados llegaron -> Volver a esperar
     this.socketService.fromEvent<any>('ROUND_RESULTS').subscribe((res) => {
       this.status = 'RESULT';
-      this.resultMessage = "¡Ronda finalizada!";
+
+      const myId = this.socketService.socketId;
+      const amIWinner = res.roundWinners.some((w: any) => w.id === myId || w.playerId === myId);
+
+      if (amIWinner) {
+        this.resultMessage = "¡GANASTE! VE POR TU PREMIO 🎁";
+      } else {
+        this.resultMessage = "¡Ronda finalizada!";
+      }
+
       this.currentQuestionText = '';
     });
   }

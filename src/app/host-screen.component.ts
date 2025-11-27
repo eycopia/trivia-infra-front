@@ -133,9 +133,21 @@ export class HostScreenComponent implements OnInit {
     const token = localStorage.getItem('admin_token');
     this.socketService.emit('ADMIN_INIT_GAME', { token, gameId: this.gameId });
 
-    // Cargar preguntas para tener el count y data local
-    this.http.get<any[]>(`${environment.apiUrl}/api/games/${this.gameId}/questions`).subscribe(data => {
-      this.questionsList = data;
+    // Escuchar Sincronización de Estado (Reconexión o Inicio)
+    this.socketService.fromEvent<any>('GAME_STATE_SYNC').subscribe(state => {
+      console.log("sync", state)
+      this.gameState = state.status;
+      this.currentQIndex = state.currentQIndex;
+      this.questionsList = state.questions;
+      this.playerCount = state.playerCount;
+
+      if (state.currentQuestion) {
+        this.currentQuestion = state.currentQuestion;
+      }
+
+      if (this.gameState === 'QUESTION') {
+        this.startTimer(); // Reiniciar timer visualmente (idealmente sincronizar tiempo exacto)
+      }
     });
 
     // Escuchar actualizaciones
@@ -161,6 +173,7 @@ export class HostScreenComponent implements OnInit {
 
   startNextQuestion() {
     if (this.currentQIndex >= this.questionsList.length) return;
+    console.log("aaaaaaaaaaaaaa", this.currentQIndex, this.questionsList.length)
 
     const token = localStorage.getItem('admin_token');
     this.socketService.emit('ADMIN_START_QUESTION', {

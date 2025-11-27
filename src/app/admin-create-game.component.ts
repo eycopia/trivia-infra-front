@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 @Component({
     selector: 'app-admin-create-game',
@@ -70,7 +71,7 @@ export class AdminCreateGameComponent {
     }
 
     loadGames() {
-        this.http.get<any[]>('http://localhost:3000/api/games').subscribe(data => {
+        this.http.get<any[]>(`${environment.apiUrl}/api/games`).subscribe(data => {
             this.games = data;
         });
     }
@@ -81,7 +82,7 @@ export class AdminCreateGameComponent {
         const token = localStorage.getItem('admin_token');
         const headers = new HttpHeaders().set('Authorization', token || '');
 
-        this.http.post('http://localhost:3000/api/games', {
+        this.http.post(`${environment.apiUrl}/api/games`, {
             title: this.title,
             description: this.description
         }, { headers }).subscribe({

@@ -11,6 +11,10 @@ export class SocketService {
     this.socket = io(environment.socketUrl);
   }
 
+  get socketId() {
+    return this.socket.id;
+  }
+
   emit(event: string, data?: any) {
     this.socket.emit(event, data);
   }
