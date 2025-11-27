@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SocketService } from './services/socket.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-game-player',
@@ -14,6 +15,10 @@ import { SocketService } from './services/socket.service';
         <div class="flex items-center gap-2">
            <span class="text-2xl bg-white/10 w-10 h-10 flex items-center justify-center rounded-full">👤</span>
            <div class="text-white font-bold text-lg max-w-[150px] truncate">{{ myName }}</div>
+        </div>
+        <div class="flex items-center gap-2">
+           <span class="text-2xl bg-white/10 w-10 h-10 flex items-center justify-center rounded-full">🏠</span>
+           <div class="text-white font-bold text-lg max-w-[150px] truncate" (click)="goToHome()">Inicio</div>
         </div>
         <div class="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full font-mono text-sm font-bold border border-indigo-500/30">
           EN VIVO
@@ -85,7 +90,7 @@ import { SocketService } from './services/socket.service';
 })
 export class GamePlayerComponent implements OnInit {
   private socketService = inject(SocketService);
-
+  private router = inject(Router);
   status: 'WAITING' | 'QUESTION' | 'ANSWER_SENT' | 'RESULT' = 'WAITING';
   myName: string = '';
   resultMessage: string = '';
@@ -135,5 +140,9 @@ export class GamePlayerComponent implements OnInit {
       gameId: this.gameId,
       answerIdx: idx
     });
+  }
+
+  goToHome() {
+    this.router.navigate(['/']);
   }
 }
