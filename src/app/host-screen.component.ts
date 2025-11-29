@@ -80,7 +80,6 @@ export class HostScreenComponent implements OnInit, OnDestroy {
   private socketSubscriptions: Subscription[] = [];
 
   ngOnInit() {
-    console.log("iniiiiiiiit host")
     // Escuchar cambios en la ruta para reiniciar el juego si cambia el ID
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const newGameId = params.get('gameId');
@@ -138,7 +137,6 @@ export class HostScreenComponent implements OnInit, OnDestroy {
     // Escuchar Sincronización de Estado
     this.socketSubscriptions.push(
       this.socketService.fromEvent<any>('GAME_STATE_SYNC').subscribe(state => {
-        console.log("syncccccc", state);
         this.gameState = state.status;
 
         if (state.gameSettings) {
@@ -193,6 +191,7 @@ export class HostScreenComponent implements OnInit, OnDestroy {
 
     this.socketSubscriptions.push(
       this.socketService.fromEvent<any>('LOTTERY_RESULTS').subscribe(res => {
+
         this.lotteryWinners = res.lotteryWinners;
         if (res.playersPool) {
           this.allPlayersForLottery = res.playersPool;
@@ -213,7 +212,6 @@ export class HostScreenComponent implements OnInit, OnDestroy {
 
     this.socketSubscriptions.push(
       this.socketService.fromEvent<any[]>('LEADERBOARD_UPDATE').subscribe(l => {
-        console.log("leaderboard", l);
         this.leaderboard = l;
         this.allPlayersForLottery = l;
       })
@@ -260,6 +258,6 @@ export class HostScreenComponent implements OnInit, OnDestroy {
   }
 
   exitGame() {
-    this.router.navigate(['/admin/create-game']);
+    this.router.navigate(['/admin/games']);
   }
 }

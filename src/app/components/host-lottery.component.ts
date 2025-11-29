@@ -5,9 +5,15 @@ import { CommonModule } from '@angular/common';
     selector: 'app-host-lottery',
     standalone: true,
     imports: [CommonModule],
+    styles: [`
+        :host {
+            display: block;
+            height: 100%;
+        }
+    `],
     template: `
     @if (lotteryState === 'WAITING') {
-        <div class="h-full flex flex-col items-center justify-center">
+        <div class="h-full flex flex-col items-center justify-center text-center p-4">
             <h1 class="text-7xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-yellow-500">
               GRAN SORTEO
             </h1>
@@ -50,24 +56,26 @@ import { CommonModule } from '@angular/common';
     }
 
     @if (lotteryState === 'RESULT') {
-        <div class="h-full flex flex-col items-center justify-center">
-            <h1 class="text-6xl font-extrabold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600">
-              🎉 ¡GANADORES! 🎉
-            </h1>
-            
-            <div class="flex flex-wrap justify-center gap-8 max-w-6xl">
-                @for (winner of lotteryWinners; track winner.id) {
-                    <div class="bg-gradient-to-b from-slate-800 to-slate-900 p-8 rounded-2xl border-2 border-yellow-500/50 shadow-2xl flex flex-col items-center min-w-[250px] animate-scaleIn">
-                        <div class="text-8xl mb-4">{{ winner.avatar }}</div>
-                        <div class="text-3xl font-bold text-white mb-2">{{ winner.name }}</div>
-                        <div class="text-yellow-400 font-mono">{{ winner.extra }}</div>
-                    </div>
-                }
+        <div class="h-full overflow-y-auto custom-scrollbar">
+            <div class="min-h-full flex flex-col items-center justify-center py-20">
+                <h1 class="text-6xl font-extrabold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 text-center">
+                  🎉 ¡GANADORES! 🎉
+                </h1>
+                
+                <div class="flex flex-wrap justify-center gap-8 max-w-6xl px-4">
+                    @for (winner of lotteryWinners; track winner.id) {
+                        <div class="bg-gradient-to-b from-slate-800 to-slate-900 p-8 rounded-2xl border-2 border-yellow-500/50 shadow-2xl flex flex-col items-center min-w-[250px] animate-scaleIn">
+                            <div class="text-8xl mb-4">{{ winner.avatar }}</div>
+                            <div class="text-3xl font-bold text-white mb-2 text-center">{{ winner.name }}</div>
+                            <div class="text-yellow-400 font-mono">{{ winner.extra }}</div>
+                        </div>
+                    }
+                </div>
+                
+                <button (click)="onExit()" class="mt-16 px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition border border-white/20 shrink-0">
+                    Volver al Panel
+                </button>
             </div>
-            
-            <button (click)="onExit()" class="mt-16 px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition border border-white/20">
-                Volver al Panel
-            </button>
         </div>
     }
   `
@@ -86,6 +94,7 @@ export class HostLotteryComponent implements OnInit, OnDestroy {
     timerInterval: any;
     lotteryAnimationInterval: any;
     currentLotteryPlayer: any = null;
+
 
     ngOnInit() {
         this.timeLeft = this.timerDuration;

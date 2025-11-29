@@ -36,7 +36,7 @@ import { Router } from '@angular/router';
              @if (status === 'RESULT') {
                <span class="text-yellow-400 font-bold block mb-2 text-xl">{{ resultMessage }}</span>
              }
-             Esperando la siguiente pregunta...
+             Esperando indicaciones del organizador...
           </p>
         </div>
       }
@@ -96,6 +96,7 @@ export class GamePlayerComponent implements OnInit {
   resultMessage: string = '';
   gameId: string | null = null;
   currentQuestionText: string = '';
+  finSorteo: boolean = false;
 
   constructor() {
     this.myName = localStorage.getItem('player_name') || 'Jugador';
@@ -142,6 +143,8 @@ export class GamePlayerComponent implements OnInit {
       }
 
       this.currentQuestionText = '';
+
+
     });
 
     // 4. Resultados de Lottery
@@ -155,11 +158,13 @@ export class GamePlayerComponent implements OnInit {
         w.id === myId || (myPlayerId && w.playerId === myPlayerId)
       );
 
-      if (amIWinner) {
-        this.resultMessage = "¡GANASTE EL SORTEO! 🎁 VE POR TU PREMIO";
-      } else {
-        this.resultMessage = "Sorteo finalizado. ¡Suerte la próxima!";
-      }
+      setTimeout(() => {
+        if (amIWinner) {
+          this.resultMessage = "¡GANASTE EL SORTEO! 🎁 VE POR TU PREMIO";
+        } else {
+          this.resultMessage = "Sorteo finalizado. ¡Suerte la próxima!";
+        }
+      }, 25000);
 
       this.currentQuestionText = '';
     });
