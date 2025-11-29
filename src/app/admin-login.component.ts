@@ -56,8 +56,8 @@ export class AdminLoginComponent {
       .subscribe({
         next: (res) => {
           if (res.success) {
-            localStorage.setItem('admin_token', res.token);
-            this.router.navigate(['/admin/create-game']);
+            localStorage.setItem('admin_token', res.admin_token);
+            this.router.navigate(['/admin/games']);
           }
         },
         error: () => {

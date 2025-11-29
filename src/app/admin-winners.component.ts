@@ -1,13 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
+import { ModalComponent } from './components/modal.component';
 
 @Component({
   selector: 'app-admin-winners',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, ModalComponent],
   template: `
     <div class="min-h-screen bg-slate-900 p-6 font-sans text-white">
       <div class="max-w-4xl mx-auto">
@@ -59,6 +60,13 @@ import { environment } from '../environments/environment';
         </div>
       </div>
     </div>
+
+    <!-- Error Modal -->
+    <app-modal [(isOpen)]="showMessageModal" 
+               type="alert" 
+               [title]="messageTitle"
+               [message]="messageText">
+    </app-modal>
   `
 })
 export class AdminWinnersComponent implements OnInit {
@@ -66,31 +74,34 @@ export class AdminWinnersComponent implements OnInit {
   private router = inject(Router);
   winners: any[] = [];
 
+  // Modal state
+  showMessageModal = false;
+  messageTitle = '';
+  messageText = '';
+
   ngOnInit() {
     this.loadWinners();
   }
 
   loadWinners() {
-    const token = localStorage.getItem('admin_token');
-    const headers = new HttpHeaders().set('Authorization', token || '');
-
-    this.http.get<any[]>(`${environment.apiUrl}/api/winners`, { headers }).subscribe({
+    this.http.get<any[]>(`${environment.apiUrl}/api/winners`).subscribe({
       next: (data) => this.winners = data,
       error: (err) => console.error(err)
     });
   }
 
   markClaimed(id: number) {
-    const token = localStorage.getItem('admin_token');
-    const headers = new HttpHeaders().set('Authorization', token || '');
-
-    this.http.post(`${environment.apiUrl}/api/winners/${id}/claim`, {}, { headers }).subscribe({
+    this.http.post(`${environment.apiUrl}/api/winners/${id}/claim`, {}).subscribe({
       next: () => this.loadWinners(),
-      error: (err) => alert('Error: ' + err.message)
+      error: (err) => {
+        this.messageTitle = 'Error';
+        this.messageText = 'Error: ' + err.message;
+        this.showMessageModal = true;
+      }
     });
   }
 
   goBack() {
-    this.router.navigate(['/admin/create-game']);
+    this.router.navigate(['/admin/games']);
   }
 }

@@ -99,10 +99,17 @@ export class GamePlayerComponent implements OnInit {
 
   constructor() {
     this.myName = localStorage.getItem('player_name') || 'Jugador';
-    this.gameId = localStorage.getItem('game_id');
   }
 
   ngOnInit() {
+    // Obtener gameId de la ruta
+    const gameId = localStorage.getItem('game_id');
+    if (!gameId) {
+      this.router.navigate(['/games']);
+      return;
+    }
+    this.gameId = gameId;
+
     // 1. Nueva pregunta inicia -> Mostrar botones
     this.socketService.fromEvent<any>('NEW_QUESTION').subscribe((q) => {
       this.status = 'QUESTION';
@@ -132,6 +139,26 @@ export class GamePlayerComponent implements OnInit {
         this.resultMessage = "¡GANASTE! VE POR TU PREMIO 🎁";
       } else {
         this.resultMessage = "¡Ronda finalizada!";
+      }
+
+      this.currentQuestionText = '';
+    });
+
+    // 4. Resultados de Lottery
+    this.socketService.fromEvent<any>('LOTTERY_RESULTS').subscribe((res) => {
+      this.status = 'RESULT';
+
+      const myId = this.socketService.socketId;
+      const myPlayerId = localStorage.getItem('player_id');
+
+      const amIWinner = res.lotteryWinners.some((w: any) =>
+        w.id === myId || (myPlayerId && w.playerId === myPlayerId)
+      );
+
+      if (amIWinner) {
+        this.resultMessage = "¡GANASTE EL SORTEO! 🎁 VE POR TU PREMIO";
+      } else {
+        this.resultMessage = "Sorteo finalizado. ¡Suerte la próxima!";
       }
 
       this.currentQuestionText = '';

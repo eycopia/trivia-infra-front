@@ -2,13 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SocketService } from './services/socket.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-host-screen',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule],
   template: `
     <div class="h-screen bg-slate-900 text-white overflow-hidden relative font-sans">
 
@@ -24,7 +24,13 @@ import { environment } from '../environments/environment';
           <h1 class="text-7xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
             ¿Listos?
           </h1>
-          <div class="text-3xl text-gray-400 mb-12">Próxima pregunta: #{{ currentQIndex + 1 }} / {{ questionsList.length }}</div>
+          <div class="text-3xl text-gray-400 mb-12">
+            @if (currentQIndex < questionsList.length) {
+                Próxima pregunta: #{{ currentQIndex + 1 }} / {{ questionsList.length }}
+            } @else {
+                ¡Juego Terminado!
+            }
+          </div>
 
           <div class="flex gap-4 mb-12">
               @for (p of leaderboard; track p.id) {
@@ -143,7 +149,16 @@ export class HostScreenComponent implements OnInit {
     this.socketService.fromEvent<any>('GAME_STATE_SYNC').subscribe(state => {
       console.log("sync", state)
       this.gameState = state.status;
-      this.currentQIndex = state.currentQIndex;
+
+      // Si estamos en WAITING, el índice actual del backend es la ÚLTIMA pregunta jugada.
+      // Así que la siguiente es +1.
+      // Si el backend dice -1 (inicio), entonces la siguiente es 0.
+      if (this.gameState === 'WAITING') {
+        this.currentQIndex = state.currentQIndex + 1;
+      } else {
+        this.currentQIndex = state.currentQIndex;
+      }
+
       this.questionsList = state.questions;
       this.playerCount = state.playerCount;
 

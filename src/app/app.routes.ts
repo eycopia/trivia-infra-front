@@ -4,24 +4,30 @@ import { GamePlayerComponent } from './game-player.component';
 import { AdminLoginComponent } from './admin-login.component';
 import { HostScreenComponent } from './host-screen.component';
 import { GameSelectionComponent } from './game-selection.component';
+import { AdminGamesComponent } from './admin-games.component';
 import { AdminCreateGameComponent } from './admin-create-game.component';
 import { AdminQuestionsComponent } from './admin-questions.component';
 import { AdminWinnersComponent } from './admin-winners.component';
 import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
-    { path: '', component: GameSelectionComponent },
-    { path: 'login/:gameId', component: LoginComponent },
-    { path: 'game', component: GamePlayerComponent },
+    { path: '', component: LoginComponent },
+    { path: 'games', component: GameSelectionComponent },
+    { path: 'game/:gameId', component: GamePlayerComponent },
     { path: 'admin/login', component: AdminLoginComponent },
     {
-        path: 'admin/host/:gameId',
-        component: HostScreenComponent,
+        path: 'admin/games',
+        component: AdminGamesComponent,
         canActivate: [AdminGuard]
     },
     {
         path: 'admin/create-game',
         component: AdminCreateGameComponent,
+        canActivate: [AdminGuard]
+    },
+    {
+        path: 'admin/host/:gameId',
+        component: HostScreenComponent,
         canActivate: [AdminGuard]
     },
     {

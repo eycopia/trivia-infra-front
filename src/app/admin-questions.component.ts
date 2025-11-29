@@ -1,14 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../environments/environment';
+import { ModalComponent } from './components/modal.component';
 
 @Component({
     selector: 'app-admin-questions',
     standalone: true,
-    imports: [CommonModule, FormsModule, HttpClientModule],
+    imports: [CommonModule, FormsModule, ModalComponent],
     template: `
     <div class="min-h-screen bg-slate-900 p-6 font-sans text-white">
       <div class="max-w-3xl mx-auto">
@@ -61,7 +62,7 @@ import { environment } from '../environments/environment';
                             }
                         </ul>
                     </div>
-                    <button (click)="deleteQuestion(q.id)" 
+                    <button (click)="confirmDelete(q.id)" 
                             class="ml-4 text-red-400 hover:text-red-300 transition p-2"
                             title="Eliminar pregunta">
                         🗑️
@@ -71,6 +72,24 @@ import { environment } from '../environments/environment';
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <app-modal [(isOpen)]="showDeleteModal" 
+               type="confirm" 
+               [title]="'Confirmar Eliminación'"
+               [message]="'¿Estás seguro de que quieres eliminar esta pregunta?'"
+               [confirmLabel]="'Eliminar'"
+               [cancelLabel]="'Cancelar'"
+               (confirm)="executeDelete()"
+               (cancel)="cancelDelete()">
+    </app-modal>
+
+    <!-- Success/Error Modal -->
+    <app-modal [(isOpen)]="showMessageModal" 
+               type="alert" 
+               [title]="messageTitle"
+               [message]="messageText">
+    </app-modal>
   `
 })
 export class AdminQuestionsComponent implements OnInit {
@@ -86,6 +105,13 @@ export class AdminQuestionsComponent implements OnInit {
         options: ['', '', '', ''],
         answer_idx: 0
     };
+
+    // Modal state
+    showDeleteModal = false;
+    showMessageModal = false;
+    messageTitle = '';
+    messageText = '';
+    deleteQuestionId: number | null = null;
 
     ngOnInit() {
         this.gameId = this.route.snapshot.paramMap.get('id');
@@ -107,37 +133,48 @@ export class AdminQuestionsComponent implements OnInit {
     addQuestion() {
         if (!this.isValid() || !this.gameId) return;
 
-        const token = localStorage.getItem('admin_token');
-        const headers = new HttpHeaders().set('Authorization', token || '');
-
         this.http.post(`${environment.apiUrl}/api/games/${this.gameId}/questions`, {
             text: this.newQuestion.text,
             options: this.newQuestion.options,
             answer_idx: this.newQuestion.answer_idx
-        }, { headers }).subscribe({
+        }).subscribe({
             next: () => {
                 this.newQuestion = { text: '', options: ['', '', '', ''], answer_idx: 0 };
                 this.loadQuestions();
             },
-            error: (err) => alert('Error: ' + err.message)
+            error: (err) => {
+                this.messageTitle = 'Error';
+                this.messageText = 'Error: ' + err.message;
+                this.showMessageModal = true;
+            }
         });
     }
 
-    deleteQuestion(questionId: number) {
-        if (!confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) return;
+    confirmDelete(questionId: number) {
+        this.deleteQuestionId = questionId;
+        this.showDeleteModal = true;
+    }
 
-        const token = localStorage.getItem('admin_token');
-        const headers = new HttpHeaders().set('Authorization', token || '');
+    executeDelete() {
+        if (!this.deleteQuestionId) return;
 
-        this.http.delete(`${environment.apiUrl}/api/questions/${questionId}`, { headers }).subscribe({
+        this.http.delete(`${environment.apiUrl}/api/games/questions/${this.deleteQuestionId}`).subscribe({
             next: () => {
                 this.loadQuestions();
             },
-            error: (err) => alert('Error al eliminar: ' + err.message)
+            error: (err) => {
+                this.messageTitle = 'Error';
+                this.messageText = 'Error al eliminar: ' + err.message;
+                this.showMessageModal = true;
+            }
         });
     }
 
+    cancelDelete() {
+        this.deleteQuestionId = null;
+    }
+
     goBack() {
-        this.router.navigate(['/admin/create-game']);
+        this.router.navigate(['/admin/games']);
     }
 }
