@@ -10,16 +10,19 @@ import { environment } from '../environments/environment';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 font-sans">
-      <!-- Header con info del jugador -->
-      <div class="w-full max-w-4xl mb-6">
-        <div class="flex items-center gap-3 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-2 w-fit">
+    <div class="min-h-screen bg-slate-900 flex flex-col items-center p-6 font-sans">
+      <!-- Header con info del jugador y logout -->
+      <div class="w-full max-w-4xl mb-8 flex justify-between items-center bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3">
+        <div class="flex items-center gap-3">
           <span class="text-3xl">{{ playerAvatar }}</span>
           <div>
             <div class="text-white font-bold">{{ playerName }}</div>
             <div class="text-gray-400 text-sm">{{ playerExtra }}</div>
           </div>
         </div>
+        <button (click)="logout()" class="bg-red-500/20 hover:bg-red-500/40 text-red-300 px-4 py-2 rounded-lg transition-colors text-sm font-semibold border border-red-500/20">
+          Salir
+        </button>
       </div>
 
       <div class="text-center mb-8 relative">
@@ -108,6 +111,15 @@ export class GameSelectionComponent implements OnInit {
     });
 
     this.router.navigate(['/game', gameId]);
+  }
+
+  logout() {
+    localStorage.removeItem('player_name');
+    localStorage.removeItem('player_extra');
+    localStorage.removeItem('player_avatar');
+    localStorage.removeItem('player_id');
+    localStorage.removeItem('game_id');
+    this.router.navigate(['/']);
   }
 
   goToAdmin() {
