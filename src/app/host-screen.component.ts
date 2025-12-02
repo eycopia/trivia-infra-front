@@ -149,7 +149,7 @@ export class HostScreenComponent implements OnInit, OnDestroy {
     this.socketSubscriptions.push(
       this.socketService.fromEvent<any>('GAME_STATE_SYNC').subscribe(state => {
         this.gameState = state.status;
-        console.log("game state sync", this.gameState)
+
         if (state.gameSettings) {
           this.gameKind = state.gameSettings.game_kind || 'questions';
         }
@@ -273,6 +273,7 @@ export class HostScreenComponent implements OnInit, OnDestroy {
 
     const token = localStorage.getItem('admin_token');
     this.socketService.emit('ADMIN_FINISH_GAME', { token, gameId: this.gameId });
+    this.router.navigate(['/admin/games']);
   }
 
   exitGame() {

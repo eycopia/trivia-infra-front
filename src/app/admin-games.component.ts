@@ -59,7 +59,7 @@ import { ModalComponent } from './components/modal.component';
                       @if (game.game_kind === 'questions') {
                         <span>Ganadores por pregunta: {{ game.winners }}</span>
                       } @else {
-                        <span>Total ganadores: {{ game.total_winners }}</span>
+                        <span>Total ganadores: {{ game.winners }}</span>
                       }
                       <span>Creado: {{ formatDate(game.created_at) }}</span>
                     </div>
@@ -132,21 +132,13 @@ import { ModalComponent } from './components/modal.component';
           </div>
         </div>
 
-        @if (editForm.game_kind === 'questions') {
-          <div>
-            <label class="block text-gray-300 text-sm font-bold mb-2">Ganadores por Pregunta</label>
-            <input [(ngModel)]="editForm.winners" type="number" min="1" 
-                   class="w-full bg-slate-700 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none">
-          </div>
-        }
-
-        @if (editForm.game_kind === 'lottery') {
-          <div>
-            <label class="block text-gray-300 text-sm font-bold mb-2">Total de Ganadores del Sorteo</label>
-            <input [(ngModel)]="editForm.total_winners" type="number" min="1" 
-                   class="w-full bg-slate-700 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none">
-          </div>
-        }
+        <div>
+          <label class="block text-gray-300 text-sm font-bold mb-2">
+            {{ editForm.game_kind === 'questions' ? 'Ganadores por Pregunta' : 'Total de Ganadores' }}
+          </label>
+          <input [(ngModel)]="editForm.winners" type="number" min="1" 
+                 class="w-full bg-slate-700 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none">
+        </div>
 
         <div>
           <label class="flex items-center gap-2 cursor-pointer">
@@ -210,7 +202,6 @@ export class AdminGamesComponent implements OnInit {
     description: '',
     game_kind: 'questions',
     winners: 1,
-    total_winners: 3,
     avoid_winners: true
   };
 
@@ -246,7 +237,6 @@ export class AdminGamesComponent implements OnInit {
       description: game.description,
       game_kind: game.game_kind,
       winners: game.winners || 1,
-      total_winners: game.total_winners || 3,
       avoid_winners: game.avoid_winners
     };
     this.showEditModal = true;
@@ -259,8 +249,7 @@ export class AdminGamesComponent implements OnInit {
       title: this.editForm.title,
       description: this.editForm.description,
       game_kind: this.editForm.game_kind,
-      winners: this.editForm.game_kind === 'questions' ? this.editForm.winners : null,
-      total_winners: this.editForm.game_kind === 'lottery' ? this.editForm.total_winners : null,
+      winners: this.editForm.winners,
       avoid_winners: this.editForm.avoid_winners
     }).subscribe({
       next: () => {

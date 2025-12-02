@@ -45,21 +45,15 @@ import { ModalComponent } from './components/modal.component';
             </div>
           </div>
 
-          @if (gameKind === 'questions') {
-            <div class="mb-4">
-              <label class="block text-gray-300 text-sm font-bold mb-2">Ganadores por Pregunta</label>
-              <input [(ngModel)]="winners" type="number" min="1" class="w-full bg-slate-700 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none">
-              <p class="text-xs text-gray-400 mt-1">Cuántos jugadores ganan por cada pregunta</p>
-            </div>
-          }
-
-          @if (gameKind === 'lottery') {
-            <div class="mb-4">
-              <label class="block text-gray-300 text-sm font-bold mb-2">Total de Ganadores del Sorteo</label>
-              <input [(ngModel)]="totalWinners" type="number" min="1" class="w-full bg-slate-700 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none">
-              <p class="text-xs text-gray-400 mt-1">Cuántos jugadores ganarán en el sorteo</p>
-            </div>
-          }
+          <div class="mb-4">
+            <label class="block text-gray-300 text-sm font-bold mb-2">
+                {{ gameKind === 'questions' ? 'Ganadores por Pregunta' : 'Total de Ganadores' }}
+            </label>
+            <input [(ngModel)]="winners" type="number" min="1" class="w-full bg-slate-700 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none">
+            <p class="text-xs text-gray-400 mt-1">
+                {{ gameKind === 'questions' ? 'Cuántos jugadores ganan por cada pregunta' : 'Cuántos jugadores ganarán en el sorteo' }}
+            </p>
+          </div>
 
           <div class="mb-6">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -97,7 +91,6 @@ export class AdminCreateGameComponent {
   description = '';
   gameKind: 'questions' | 'lottery' = 'questions';
   winners = 1;
-  totalWinners = 3;
   avoidWinners = true;
 
   // Modal state
@@ -113,8 +106,7 @@ export class AdminCreateGameComponent {
       title: this.title,
       description: this.description,
       game_kind: this.gameKind,
-      winners: this.gameKind === 'questions' ? this.winners : null,
-      total_winners: this.gameKind === 'lottery' ? this.totalWinners : null,
+      winners: this.winners,
       avoid_winners: this.avoidWinners
     }).subscribe({
       next: () => {

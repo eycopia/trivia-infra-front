@@ -20,13 +20,13 @@ import { v4 as uuidv4 } from 'uuid';
       <!-- Tarjeta de Ingreso -->
       <div class="w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl p-6 shadow-2xl">
         <div class="mb-4">
-          <label class="block text-gray-300 text-sm font-bold mb-2">Tu Nombre (Max 12)</label>
-          <input [(ngModel)]="name" (ngModelChange)="name = $event.toLowerCase()" maxlength="12" type="text" class="w-full bg-slate-800 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none focus:border-indigo-500 transition-colors">
+          <label class="block text-gray-300 text-sm font-bold mb-2">Tu Nombre (Max 12) <span class="text-red-500">*</span></label>
+          <input [(ngModel)]="name" (ngModelChange)="name = $event.toLowerCase()" maxlength="12" required type="text" class="w-full bg-slate-800 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none focus:border-indigo-500 transition-colors">
         </div>
 
         <div class="mb-6">
-          <label class="block text-gray-300 text-sm font-bold mb-2">Matrícula (Min 4)</label>
-          <input [(ngModel)]="extra" (ngModelChange)="extra = $event.toLowerCase()" type="text" class="w-full bg-slate-800 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none focus:border-indigo-500 transition-colors">
+          <label class="block text-gray-300 text-sm font-bold mb-2">Matrícula (Min 4) <span class="text-red-500">*</span></label>
+          <input [(ngModel)]="extra" (ngModelChange)="extra = $event.toUpperCase()" required type="text" class="w-full bg-slate-800 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none focus:border-indigo-500 transition-colors">
         </div>
 
         <label class="block text-gray-300 text-sm font-bold mb-2">Elige Avatar</label>

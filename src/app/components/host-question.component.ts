@@ -20,16 +20,6 @@ import { CommonModule } from '@angular/common';
           }
         </div>
 
-        <div class="flex gap-4 mb-12">
-            @for (p of leaderboard; track p.id) {
-               <div class="flex flex-col items-center animate-bounce">
-                  <span class="text-5xl">{{ p.avatar }}</span>
-                  <span class="text-sm mt-2 font-bold">{{ p.name }}</span>
-                  <span class="text-xs text-yellow-400">{{ p.score }} pts</span>
-               </div>
-            }
-        </div>
-
         <div class="flex flex-col gap-4">
           <button (click)="onStartQuestion()" 
                   [disabled]="currentQIndex >= totalQuestions"
@@ -83,6 +73,7 @@ import { CommonModule } from '@angular/common';
                     <div class="bg-white text-black p-6 rounded-2xl text-center min-w-[200px]">
                         <div class="text-6xl mb-2">{{ w.avatar }}</div>
                         <div class="text-2xl font-bold">{{ w.name }}</div>
+                        <div class="text-xl text-green-600 font-bold mt-2">{{ w.extra }}</div>
                     </div>
                 }
             </div>
