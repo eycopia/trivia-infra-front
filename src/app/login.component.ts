@@ -25,7 +25,7 @@ import { v4 as uuidv4 } from 'uuid';
         </div>
 
         <div class="mb-6">
-          <label class="block text-gray-300 text-sm font-bold mb-2">Matrícula</label>
+          <label class="block text-gray-300 text-sm font-bold mb-2">Matrícula (Min 4)</label>
           <input [(ngModel)]="extra" (ngModelChange)="extra = $event.toLowerCase()" type="text" class="w-full bg-slate-800 text-white border border-slate-600 rounded-lg py-3 px-4 outline-none focus:border-indigo-500 transition-colors">
         </div>
 
@@ -42,7 +42,7 @@ import { v4 as uuidv4 } from 'uuid';
         </div>
 
         <button (click)="login()"
-                [disabled]="!name || !selectedAvatar"
+                [disabled]="!name || !selectedAvatar || !extra || extra.length < 4"
                 class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg disabled:opacity-50 hover:scale-[1.02] transition-transform">
           ¡CONTINUAR!
         </button>
@@ -75,7 +75,7 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    if (!this.name || !this.selectedAvatar) return;
+    if (!this.name || !this.selectedAvatar || !this.extra || this.extra.length < 4) return;
 
     const playerId = uuidv4();
 
