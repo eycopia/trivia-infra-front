@@ -6,7 +6,6 @@ export const adminAuthInterceptor: HttpInterceptorFn = (req, next) => {
     if (req.url.includes('/api/')) {
         const adminToken = localStorage.getItem('admin_token');
 
-        console.log("agregare token", adminToken)
         if (adminToken) {
             // Clonar la petición y agregar el header de autorización
             const clonedReq = req.clone({
@@ -14,7 +13,6 @@ export const adminAuthInterceptor: HttpInterceptorFn = (req, next) => {
                     Authorization: adminToken
                 }
             });
-            console.log("token agregado", clonedReq)
             return next(clonedReq);
         }
     }

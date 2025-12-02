@@ -98,10 +98,13 @@ export class HostLotteryComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.timeLeft = this.timerDuration;
+        console.log("loterrr statys ", this.lotteryState)
     }
 
     ngOnChanges(changes: any) {
+        console.log("loterrr cambio ", this.lotteryState)
         if (changes.lotteryState && changes.lotteryState.currentValue === 'RUNNING') {
+
             this.startAnimation();
         }
     }

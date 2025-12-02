@@ -27,17 +27,30 @@ import { Router } from '@angular/router';
 
       <!-- LÓGICA DE ESTADOS CON @if -->
 
-      <!-- 1. ESPERANDO -->
-      @if (status === 'WAITING' || status === 'RESULT') {
+      
+      @if (status === 'WAITING') {
         <div class="flex-1 flex flex-col items-center justify-center p-8 text-center animate-pulse">
-          <div class="text-7xl mb-6">👀</div>
-          <h2 class="text-2xl text-white font-bold mb-2">Mira la pantalla</h2>
-          <p class="text-slate-400">
-             @if (status === 'RESULT') {
-               <span class="text-yellow-400 font-bold block mb-2 text-xl">{{ resultMessage }}</span>
-             }
-             Esperando indicaciones del organizador...
-          </p>
+          <p>El juego aun no ha iniciado, espera a que el organizador lo inicie.. <br/>
+          Revisa que no estes en el juego equivocado.</p>
+        </div>
+      }
+      
+      @if (status === 'RESULT' || status === 'FINISHED') {
+        <div class="flex-1 flex flex-col items-center justify-center p-8 text-center animate-pulse">
+          @if (status === 'FINISHED') {
+             <div class="text-7xl mb-6">🏁</div>
+             <h2 class="text-3xl text-white font-bold mb-2">Juego Terminado</h2>
+             <p class="text-slate-400 mb-4">{{ resultMessage }}</p>
+          } @else {
+             <div class="text-7xl mb-6">👀</div>
+             <h2 class="text-2xl text-white font-bold mb-2">Mira la pantalla</h2>
+             <p class="text-slate-400">
+                @if (status === 'RESULT') {
+                  <span class="text-yellow-400 font-bold block mb-2 text-xl">{{ resultMessage }}</span>
+                }
+                Esperando indicaciones del organizador...
+             </p>
+          }
         </div>
       }
 
@@ -61,25 +74,29 @@ import { Router } from '@angular/router';
             </div>
           }
 
-          <div class="grid grid-cols-2 gap-4 flex-1">
+          <div class="grid grid-cols-1 gap-4 flex-1 overflow-y-auto pb-4">
             <!-- Rojo -->
-            <button (click)="submitAnswer(0)" class="active:scale-95 transition-transform bg-red-600 rounded-2xl shadow-[0_4px_0_rgb(153,27,27)] flex items-center justify-center">
-                <span class="text-white text-5xl drop-shadow-md">▲</span>
+            <button (click)="submitAnswer(0)" class="active:scale-95 transition-transform bg-red-600 rounded-2xl shadow-[0_4px_0_rgb(153,27,27)] flex items-center justify-start p-4 min-h-[80px]">
+                <span class="text-white text-3xl drop-shadow-md mr-4 shrink-0">▲</span>
+                <span class="text-white text-lg font-bold text-left leading-tight break-words">{{ currentOptions[0] }}</span>
             </button>
 
             <!-- Azul -->
-            <button (click)="submitAnswer(1)" class="active:scale-95 transition-transform bg-blue-600 rounded-2xl shadow-[0_4px_0_rgb(30,58,138)] flex items-center justify-center">
-                <span class="text-white text-5xl drop-shadow-md">◆</span>
+            <button (click)="submitAnswer(1)" class="active:scale-95 transition-transform bg-blue-600 rounded-2xl shadow-[0_4px_0_rgb(30,58,138)] flex items-center justify-start p-4 min-h-[80px]">
+                <span class="text-white text-3xl drop-shadow-md mr-4 shrink-0">◆</span>
+                <span class="text-white text-lg font-bold text-left leading-tight break-words">{{ currentOptions[1] }}</span>
             </button>
 
             <!-- Amarillo -->
-            <button (click)="submitAnswer(2)" class="active:scale-95 transition-transform bg-yellow-500 rounded-2xl shadow-[0_4px_0_rgb(161,98,7)] flex items-center justify-center">
-                <span class="text-white text-5xl drop-shadow-md">●</span>
+            <button (click)="submitAnswer(2)" class="active:scale-95 transition-transform bg-yellow-500 rounded-2xl shadow-[0_4px_0_rgb(161,98,7)] flex items-center justify-start p-4 min-h-[80px]">
+                <span class="text-white text-3xl drop-shadow-md mr-4 shrink-0">●</span>
+                <span class="text-white text-lg font-bold text-left leading-tight break-words">{{ currentOptions[2] }}</span>
             </button>
 
             <!-- Verde -->
-            <button (click)="submitAnswer(3)" class="active:scale-95 transition-transform bg-green-600 rounded-2xl shadow-[0_4px_0_rgb(21,128,61)] flex items-center justify-center">
-                <span class="text-white text-5xl drop-shadow-md">■</span>
+            <button (click)="submitAnswer(3)" class="active:scale-95 transition-transform bg-green-600 rounded-2xl shadow-[0_4px_0_rgb(21,128,61)] flex items-center justify-start p-4 min-h-[80px]">
+                <span class="text-white text-3xl drop-shadow-md mr-4 shrink-0">■</span>
+                <span class="text-white text-lg font-bold text-left leading-tight break-words">{{ currentOptions[3] }}</span>
             </button>
           </div>
         </div>
@@ -91,11 +108,12 @@ import { Router } from '@angular/router';
 export class GamePlayerComponent implements OnInit {
   private socketService = inject(SocketService);
   private router = inject(Router);
-  status: 'WAITING' | 'QUESTION' | 'ANSWER_SENT' | 'RESULT' = 'WAITING';
+  status: 'WAITING' | 'QUESTION' | 'ANSWER_SENT' | 'RESULT' | 'FINISHED' = 'WAITING';
   myName: string = '';
   resultMessage: string = '';
   gameId: string | null = null;
   currentQuestionText: string = '';
+  currentOptions: string[] = [];
   finSorteo: boolean = false;
 
   constructor() {
@@ -116,8 +134,21 @@ export class GamePlayerComponent implements OnInit {
       this.status = 'QUESTION';
       this.resultMessage = '';
       this.currentQuestionText = q.t; // Guardar texto de la pregunta
+      this.currentOptions = q.options || []; // Guardar opciones
 
       if (navigator.vibrate) navigator.vibrate(200);
+    });
+
+    // Escuchar actualizaciones de estado general (WAITING, FINISHED)
+    this.socketService.fromEvent<any>('GAME_STATUS').subscribe((st) => {
+      if (st.status === 'FINISHED') {
+        this.status = 'FINISHED';
+        if (!this.resultMessage) {
+          this.resultMessage = "Gracias por participar.";
+        }
+      } else if (st.status === 'WAITING') {
+        this.status = 'WAITING';
+      }
     });
 
     // 2. Confirmación de que el server recibió mi clic -> Mostrar cohete

@@ -95,10 +95,24 @@ import { CommonModule } from '@angular/common';
         </button>
       </div>
     }
+    <!-- ESTADO: FINISHED -->
+    @if (gameState === 'FINISHED') {
+      <div class="h-full flex flex-col items-center justify-center">
+        <h1 class="text-7xl font-extrabold mb-8 text-white">
+          🏁 JUEGO TERMINADO 🏁
+        </h1>
+        <div class="text-3xl text-gray-400 mb-12">
+          Gracias por jugar
+        </div>
+        <button (click)="onExit()" class="px-12 py-4 bg-white text-black text-2xl font-bold rounded-full hover:scale-105 transition">
+            Salir al Panel
+        </button>
+      </div>
+    }
   `
 })
 export class HostQuestionComponent implements OnInit, OnDestroy {
-    @Input() gameState: 'WAITING' | 'QUESTION' | 'RESULT' = 'WAITING';
+    @Input() gameState: 'WAITING' | 'QUESTION' | 'RESULT' | 'FINISHED' = 'WAITING';
     @Input() currentQuestion: any = null;
     @Input() currentQIndex: number = 0;
     @Input() totalQuestions: number = 0;
@@ -116,6 +130,7 @@ export class HostQuestionComponent implements OnInit, OnDestroy {
     timerInterval: any;
 
     ngOnInit() {
+        console.log("question state", this.gameState)
         this.timeLeft = this.timerDuration;
         if (this.gameState === 'QUESTION') {
             this.startTimer();

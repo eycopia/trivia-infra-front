@@ -67,9 +67,12 @@ import { ModalComponent } from './components/modal.component';
                   
                   <div class="flex gap-2 ml-4">
                     <button (click)="hostGame(game.id)" 
+                            [disabled]="game.status === 'FINISHED'"
+                            [class.opacity-50]="game.status === 'FINISHED'"
+                            [class.cursor-not-allowed]="game.status === 'FINISHED'"
                             class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded text-sm transition"
-                            title="Hostear juego">
-                      🎮 Hostear
+                            [title]="game.status === 'FINISHED' ? 'Juego finalizado' : 'Hostear juego'">
+                      {{ game.status === 'FINISHED' ? '🏁 Finalizado' : '🎮 Hostear' }}
                     </button>
                     @if (game.game_kind === 'questions') {
                       <button (click)="manageQuestions(game.id)" 

@@ -47,6 +47,17 @@ import { Subscription } from 'rxjs';
               (exit)="exitGame()">
           </app-host-lottery>
       }
+
+      <!-- Global Finish Button (only visible when appropriate) -->
+      @if (gameState !== 'FINISHED') {
+        <div class="absolute bottom-4 right-4 z-50">
+            @if ( (gameKind === 'questions' && currentQIndex >= questionsList.length) || (gameKind === 'lottery' && lotteryState === 'RESULT') ) {
+                <button (click)="finishGame()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-colors flex items-center gap-2">
+                    <span>🏁</span> Terminar Juego
+                </button>
+            }
+        </div>
+      }
     </div>
   `
 })
@@ -60,7 +71,7 @@ export class HostScreenComponent implements OnInit, OnDestroy {
   gameKind: 'questions' | 'lottery' = 'questions';
 
   // Estado compartido
-  gameState: 'WAITING' | 'QUESTION' | 'RESULT' = 'WAITING';
+  gameState: 'WAITING' | 'QUESTION' | 'RESULT' | 'FINISHED' = 'WAITING';
   timerDuration = 25;
 
   // Estado Questions
@@ -80,6 +91,7 @@ export class HostScreenComponent implements OnInit, OnDestroy {
   private socketSubscriptions: Subscription[] = [];
 
   ngOnInit() {
+    console.log("aaa verrr")
     // Escuchar cambios en la ruta para reiniciar el juego si cambia el ID
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const newGameId = params.get('gameId');
@@ -131,14 +143,13 @@ export class HostScreenComponent implements OnInit, OnDestroy {
   }
 
   setupSocketListeners() {
-    console.log("clear")
     this.clearSocketSubscriptions(); // Clean up previous listeners
 
     // Escuchar Sincronización de Estado
     this.socketSubscriptions.push(
       this.socketService.fromEvent<any>('GAME_STATE_SYNC').subscribe(state => {
         this.gameState = state.status;
-
+        console.log("game state sync", this.gameState)
         if (state.gameSettings) {
           this.gameKind = state.gameSettings.game_kind || 'questions';
         }
@@ -255,6 +266,13 @@ export class HostScreenComponent implements OnInit, OnDestroy {
   finishLottery() {
     this.lotteryState = 'RESULT';
     this.gameState = 'RESULT';
+  }
+
+  finishGame() {
+    if (!confirm('¿Estás seguro de terminar el juego? Los jugadores verán sus resultados finales.')) return;
+
+    const token = localStorage.getItem('admin_token');
+    this.socketService.emit('ADMIN_FINISH_GAME', { token, gameId: this.gameId });
   }
 
   exitGame() {
